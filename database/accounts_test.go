@@ -106,3 +106,67 @@ func TestIntegrationAccounts_GetAccountsByID(t *testing.T) {
 		})
 	}
 }
+
+func TestIntegrationAccounts_UpdateAccounts(t *testing.T) {
+
+	ctx := context.Background()
+
+	testInfra := NewTestInfra()
+	db := testInfra.GetDB()
+
+	defer db.Close()
+
+	accountCreated := models.Account{
+		ID:      1,
+		Balance: 100.0,
+	}
+
+	tests := []struct {
+		name        string
+		input       models.Account
+		expectedGet models.Account
+		expectedErr bool
+	}{
+		{
+			name: "success",
+			input: models.Account{
+				ID:      1,
+				Balance: 1.0,
+			},
+			expectedGet: models.Account{
+				ID:      1,
+				Balance: 101.0,
+			},
+			expectedErr: false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			dbConn := database.NewDatabase(db)
+			tx, err := dbConn.Begin(ctx)
+			require.NoError(t, err)
+
+			defer tx.Rollback()
+
+			err = dbConn.InsertAccounts(ctx, models.Accounts{accountCreated})
+			require.NoError(t, err)
+
+			err = dbConn.UpdateAccounts(ctx, tx, tc.input)
+			require.Equal(t, tc.expectedErr, err != nil)
+
+			if !tc.expectedErr {
+				err = tx.Commit()
+				require.NoError(t, err)
+
+				gotten, err := dbConn.GetAccountsByID(ctx, 1)
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedGet.ID, gotten.ID)
+				require.Equal(t, tc.expectedGet.Balance, gotten.Balance)
+			}
+
+			err = hardDeleteForLocalTesting(db)
+			require.NoError(t, err)
+		})
+	}
+}

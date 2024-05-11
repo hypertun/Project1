@@ -1,0 +1,8 @@
+dsn: 'postgres://localhost:5432/test_db?user=test_user&password=test_password&sslmode=disable'
+DB_HOST: localhost
+DB_USER: test_user
+DB_PASS: test_password
+DB_PORT: 5432
+DB_SSL_MODE: disable
+PORT: 8080
+DB_NAME: test_db

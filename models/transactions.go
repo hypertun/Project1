@@ -25,6 +25,10 @@ func (t TransactionHandlerReq) ConvertToTransaction() (Transaction, error) {
 		return Transaction{}, ErrInvalidAccountID
 	}
 
+	if t.SourceAccountID == t.DestinationAccountID {
+		return Transaction{}, ErrSameAccount
+	}
+
 	amount, err := strconv.ParseFloat(t.Amount, 64)
 	if err != nil {
 		return Transaction{}, err

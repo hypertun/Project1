@@ -10,3 +10,8 @@ local-test:
 	docker-compose up -d
 	sleep 2
 	make migrate
+
+mock:
+	go install github.com/vektra/mockery/v2@latest
+	cd database/; \
+		mockery --name=DatabaseInterface --filename=DatabaseInterface.go;

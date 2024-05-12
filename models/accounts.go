@@ -1,13 +1,8 @@
 package models
 
 import (
-	"errors"
 	"strconv"
 	"time"
-)
-
-var (
-	ErrInvalidAccountID = errors.New("account id cannot less than or equal to 0")
 )
 
 type AccountCreationRequest struct {
